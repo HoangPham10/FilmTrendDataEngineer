@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% set active_page = "index" %}
+{% set navbar_title = "Hoang Pham" %}
+
+
+{% block title %}Home Page{% endblock %}
+
+{% block content %}
+
+	<div class="jumbotron" style="margin: auto; text-align: center;">
+		<br>
+		<div class="row">
+			<div class="col">
+				<img src="/static/images/airflow.png" height="50"/>
+			</div>
+			<div class="col">
+				<img src="/static/images/spark.png" height="50"/>
+			</div>
+			<div class="col">
+				<img src="/static/images/cassandra.png" height="50"/>
+			</div>
+			<div class="col">
+				<img src="/static/images/docker.png" height="50"/>
+			</div>
+		</div>
+		<br>
+		<p class="lead text-center"> This project  uses the social api <span class="lead text-center text-info">The DB movie</span> to obtain information about the tredings in movies and tv shows followed by users in the last 30 days</p>
+	</div>
+
+	<div class="container mt-5">
+		<h2 class="text-center">Movies and TV shows</h2>
+		<div class="row justify-content-center">
+			<div class="col-md-6" style="display: flex; justify-content: center;">
+				<canvas style="max-height: 400px; max-width: 400px;" id="piechart"></canvas>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		var dataFromFlask = {{ data | safe }}
+
+		document.addEventListener('DOMContentLoaded', function() {
+        var ctx = document.getElementById('piechart').getContext('2d');
+        var piechart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: Object.keys(dataFromFlask),
+                datasets: [{
+                    data: Object.values(dataFromFlask),
+                    backgroundColor: [
+						'#0d6efd',
+						'#198754',
+                    ],
+                    borderColor: 'transparent',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                var label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += Math.round(context.raw * 100) / 100;
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+	</script>
+
+{% endblock %}

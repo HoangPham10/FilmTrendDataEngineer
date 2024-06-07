@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% set active_page = "data" %}
+{% set navbar_title = "Movies" %}
+
+
+{% block title %}Home Page{% endblock %}
+
+{% block content %}
+
+	<div>
+		<div class="container">
+			<!-- <div class="row justify-content-md-center">
+			  <div class="col">
+				1 of 3
+			  </div>
+			  <div class="col col-lg-2">
+				3 of 3
+			  </div>
+			</div> -->
+			<div class="row">
+			  <div class="col">
+				<canvas  id="voteAvgChart"></canvas>
+			  </div>
+			</div>
+			<div class="row">
+				<div class="col" style="display: flex; justify-content: center;">
+				  <canvas style="max-height: 500px; max-width: 500px;"  id="voteCntChart"></canvas>
+				</div>
+				<div class="col" style="display: flex; justify-content: center;">
+					<canvas style="max-height: 500px; max-width: 500px;"  id="popularityChart"></canvas>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+				  <canvas  id="moviesChart"></canvas>
+				</div>
+			</div>
+			  
+		</div>
+
+	</div>
+
+	<div>
+		<div>
+        	Show/hide column: 
+			<a class="column-vis text-primary" data-column="1">Popularity</a> - 
+			<a class="column-vis text-primary" data-column="2">Title</a> - 
+			<a class="column-vis text-primary" data-column="3">Release Date</a> - 
+			<a class="column-vis text-primary" data-column="4">Vote Average</a> - 
+			<a class="column-vis text-primary" data-column="5">Vote Count</a> - 
+			<a class="column-vis text-primary" data-column="6">Genres</a> 
+    	</div>
+		<table id="datatable" class="display" style="width:100%"></table>
+	</div>
+
+
+
+	<script>
+
+		var dataFromFlask = {{ data_list | safe }}
+		// Vote Average
+		let vote_avg = dataFromFlask['vote_avg'] 
+		document.addEventListener('DOMContentLoaded', function() {
+			var ctx = document.getElementById('voteAvgChart').getContext('2d');
+			var myBarChart = new Chart(ctx, {
+				type: 'bar',
+				data: {
+					labels: Object.keys(vote_avg),
+					datasets: [{
+						label: 'Vote Average',
+						data: Object.values(vote_avg),
+						backgroundColor: '#0d6efd',
+						borderColor: 'transparent',
+						borderWidth: 1
+					}]
+				},
+				options: {
+					responsive: true,
+					scales: {
+						y: {
+							beginAtZero: true,
+							max: 10
+						}
+					},
+					plugins: {
+						legend: {
+							position: 'top',
+						},
+						tooltip: {
+							callbacks: {
+								label: function(context) {
+									var label = context.dataset.label || '';
+									if (label) {
+										label += ': ';
+									}
+									label += Math.round(context.raw * 100) / 100;
+									return label;
+								}
+							}
+						}
+					}
+				}
+			});
+		});
+		// vote Count
+		let vote_cnt = dataFromFlask['vote_count']
+		document.addEventListener('DOMContentLoaded', function() {
+			var ctx = document.getElementById('voteCntChart').getContext('2d');
+			var piechart = new Chart(ctx, {
+				type: 'pie',
+				data: {
+					labels: Object.keys(vote_cnt),
+					datasets: [{
+						data: Object.values(vote_cnt),
+						backgroundColor:['#FF5733', '#33FF57', '#3357FF', '#FF33A6', '#33FFD7', '#FF8C33', '#8C33FF', '#D7FF33', '#FF3333', '#33FF8C', '#3333FF', '#A6FF33', '#33A6FF', '#FF3380', '#33FFD4', '#FF8C00', '#8000FF', '#FF5733', '#33FF57', '#3357FF'],
+						borderColor: 'transparent',
+						borderWidth: 1
+					}]
+				},
+				options: {
+					responsive: true,
+					plugins: {
+						legend: {
+							position: 'top',
+						},
+						tooltip: {
+							callbacks: {
+								label: function(context) {
+									var label = context.label || '';
+									if (label) {
+										label += ': ';
+									}
+									label += Math.round(context.raw * 100) / 100;
+									return label;
+								}
+							}
+						}
+					}
+				}
+			});
+		});
+		// Popularity
+		let popularity = dataFromFlask['popularity']
+		document.addEventListener('DOMContentLoaded', function() {
+			var ctx = document.getElementById('popularityChart').getContext('2d');
+			var piechart = new Chart(ctx, {
+				type: 'pie',
+				data: {
+					labels: Object.keys(popularity),
+					datasets: [{
+						data: Object.values(popularity),
+						backgroundColor:['#FF5733', '#33FF57', '#3357FF', '#FF33A6', '#33FFD7', '#FF8C33', '#8C33FF', '#D7FF33', '#FF3333', '#33FF8C', '#3333FF', '#A6FF33', '#33A6FF', '#FF3380', '#33FFD4', '#FF8C00', '#8000FF', '#FF5733', '#33FF57', '#3357FF'],
+						borderColor: 'transparent',
+						borderWidth: 1
+					}]
+				},
+				options: {
+					responsive: true,
+					plugins: {
+						legend: {
+							position: 'top',
+						},
+						tooltip: {
+							callbacks: {
+								label: function(context) {
+									var label = context.label || '';
+									if (label) {
+										label += ': ';
+									}
+									label += Math.round(context.raw * 100) / 100;
+									return label;
+								}
+							}
+						}
+					}
+				}
+			});
+		});
+		// Number of movies by genres 
+		num_movies = dataFromFlask['num_movies']
+		document.addEventListener('DOMContentLoaded', function() {
+			var ctx = document.getElementById('moviesChart').getContext('2d');
+			var myBarChart = new Chart(ctx, {
+				type: 'bar',
+				data: {
+					labels: Object.keys(num_movies),
+					datasets: [{
+						label: 'Vote Average',
+						data: Object.values(num_movies),
+						backgroundColor: '#0d6efd',
+						borderColor: 'transparent',
+						borderWidth: 1
+					}]
+				},
+				options: {
+					responsive: true,
+					scales: {
+						y: {
+							beginAtZero: true,
+							max: 10
+						}
+					},
+					plugins: {
+						legend: {
+							position: 'top',
+						},
+						tooltip: {
+							callbacks: {
+								label: function(context) {
+									var label = context.dataset.label || '';
+									if (label) {
+										label += ': ';
+									}
+									label += Math.round(context.raw * 100) / 100;
+									return label;
+								}
+							}
+						}
+					}
+				}
+			});
+		});
+
+	
+		$(document).ready(function () {
+		    var table = $('#datatable').DataTable({
+		        data: dataFromFlask['full_data'],
+		        scrollX: true,
+		        columns: [
+		            { title: 'Id' },
+		            { title: 'Popularity' },
+		            { title: 'Title' },
+		            { title: 'Release Date' },
+		            { title: 'Vote Average' },
+		            { title: 'Vote Count' },
+		            { title: 'Genres' },
+		        ],
+		        order: [[1, 'desc']]
+		    });
+
+		    /*
+		     * Function to hide or show table columns
+		     */
+			$('a.column-vis').on('click', function (e) {
+				e.preventDefault();
+				var column = table.column($(this).attr('data-column'));
+				var classes = $(this).attr("class")
+
+				column.visible(!column.visible());
+
+				if (column.visible() == true) {
+					$(this).prop('class', classes.replace("text-muted", "") + " text-primary");
+				} else {
+					$(this).prop('class', classes.replace("text-primary", "") + " text-muted");
+				}
+			});
+		});
+	</script>
+
+{% endblock %}
